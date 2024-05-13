@@ -49,11 +49,6 @@ var myError = document.querySelector("#Error");
             myName.classList.add("is-invalid");
             myErr.textContent = "You must add a name";
             return false;
-        } else if (myName.value.length < 3) {
-            myName.classList.remove("is-valid");
-            myName.classList.add("is-invalid");
-            myErr.textContent = "Your name must contain at least 3 character";
-            return false;
         } else if (myName.value.length > 30) {
             myName.classList.remove("is-valid");
             myName.classList.add("is-invalid");
@@ -103,7 +98,7 @@ var myError = document.querySelector("#Error");
     }
 
     function checkButton() {
-        if (status && pass) {
+        if (status && pass && myName.value.trim().length > 3 && myPassword.value.trim().length > 3) {
             btn.disabled = false;
         }
     }
