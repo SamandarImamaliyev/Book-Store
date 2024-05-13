@@ -1,0 +1,36 @@
+#allBooks h3 {
+    font-family: "Roboto Slab", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-weight: bold;
+}
+
+#typeOfBook button {
+    font-family: "Montserrat", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    border: none;
+}
+
+.differ {
+    font-size: 20px;
+    color: #FF8B00;
+    font-weight: bold;
+}
+
+.book-slider {
+    height: 400px;
+    margin-top: 100px;
+    position: relative;
+
+}
+
+.arrows {
+    height: 100px;
+    width: 100px;
+    position: absolute;
+    cursor: pointer;
+    padding: 10px;
+
+    &:hover {
+        background-color: #FF8B00;
+        transition: 333ms;
+        border-radius: 40%;
+    }
+}
