@@ -30,87 +30,92 @@ const jName = document.querySelector("#joinName");
 const jEmail = document.querySelector("#joinEmail");
 const joinBtn = document.querySelector("#joinBtn");
 
+
+
 // check inputs
+
+const spacePattern = /^\S*$/; // bosluq olub-olmadigini yoxlayir
+const NumericPattern = /^([^0-9]*)$/; // reqem olmagini istemirik
+const EmailPattern = /^([a-zA-Z0-9_\-?\.?]){3,}@([a-zA-Z]){3,}\.([a-zA-Z]){2,5}$/;
+
 (function () {
     'use strict'
-
-    const spacePattern = /^\S*$/; // bosluq olub-olmadigini yoxlayir
-    const NumericPattern = /^([^0-9]*)$/; // reqem olmagini istemirik
-    const EmailPattern = /^([a-zA-Z0-9_\-?\.?]){3,}@([a-zA-Z]){3,}\.([a-zA-Z]){2,5}$/;
 
     jName.addEventListener("blur", controlName);
     jEmail.addEventListener("blur", controlEmail);
 
-    function controlName() {
-        var myJErr = document.querySelector("#ErrJName");
-        if (jName.value.length == 0) {
-            jName.classList.remove("is-valid");
-            jName.classList.add("is-invalid");
-            myJErr.textContent = "You must add a name";
-            return false;
-        } else if (jName.value.length < 3) {
-            jName.classList.remove("is-valid");
-            jName.classList.add("is-invalid");
-            myJErr.textContent = "Your name must contain at least 3 character";
-            return false;
-        } else if (jName.value.length > 30) {
-            jName.classList.remove("is-valid");
-            jName.classList.add("is-invalid");
-            myJErr.textContent = "Your name must contain maximum 30 character";
-            return false;
-        } else if (!NumericPattern.test(jName.value)) {
-            jName.classList.remove("is-valid");
-            jName.classList.add("is-invalid");
-            myJErr.textContent = "Your name can't be included a number";
-            return false;
-        } else {
-            jName.classList.remove("is-invalid");
-            jName.classList.add("is-valid");
-            return true;
-        }
-    }
-
-    function controlEmail() {
-        var myJErr = document.querySelector("#ErrJEmail");
-        if (jEmail.value.length == 0) {
-            jEmail.classList.remove("is-valid");
-            jEmail.classList.add("is-invalid");
-            myJErr.textContent = "You must add an email";
-            return false;
-        } else if (!spacePattern.test(jEmail.value)) {
-            jEmail.classList.remove("is-valid");
-            jEmail.classList.add("is-invalid");
-            myJErr.textContent = "You cant add a gap in your email";
-            return false;
-        } else if (!EmailPattern.test(jEmail.value)) {
-            jEmail.classList.remove("is-valid");
-            jEmail.classList.add("is-invalid");
-            myJErr.textContent = "Invalid email format";
-            return false;
-        } else if (jEmail.value.length > 40) {
-            jEmail.classList.remove("is-valid");
-            jEmail.classList.add("is-invalid");
-            myJErr.textContent = "Your email must contain maximum 30 character";
-            return false;
-        } else {
-            jEmail.classList.remove("is-invalid");
-            jEmail.classList.add("is-valid");
-            return true;
-        }
-    }
-
-    function activeteButton() {
-        if (controlName() && controlEmail()) {
-            joinBtn.disabled = false;
-        } else {
-            joinBtn.disabled = true;
-        }
-    }
-
-    document.addEventListener("keyup", () => {
-        activeteButton();
-    })
 })();
+
+function controlName() {
+    var myJErr = document.querySelector("#ErrJName");
+    if (jName.value.length == 0) {
+        jName.classList.remove("is-valid");
+        jName.classList.add("is-invalid");
+        myJErr.textContent = "You must add a name";
+        return false;
+    } else if (jName.value.length < 3) {
+        jName.classList.remove("is-valid");
+        jName.classList.add("is-invalid");
+        myJErr.textContent = "Your name must contain at least 3 character";
+        return false;
+    } else if (jName.value.length > 30) {
+        jName.classList.remove("is-valid");
+        jName.classList.add("is-invalid");
+        myJErr.textContent = "Your name must contain maximum 30 character";
+        return false;
+    } else if (!NumericPattern.test(jName.value)) {
+        jName.classList.remove("is-valid");
+        jName.classList.add("is-invalid");
+        myJErr.textContent = "Your name can't be included a number";
+        return false;
+    } else {
+        jName.classList.remove("is-invalid");
+        jName.classList.add("is-valid");
+        return true;
+    }
+}
+function controlEmail() {
+    var myJErr = document.querySelector("#ErrJEmail");
+    if (jEmail.value.length == 0) {
+        jEmail.classList.remove("is-valid");
+        jEmail.classList.add("is-invalid");
+        myJErr.textContent = "You must add an email";
+        return false;
+    } else if (!spacePattern.test(jEmail.value)) {
+        jEmail.classList.remove("is-valid");
+        jEmail.classList.add("is-invalid");
+        myJErr.textContent = "You cant add a gap in your email";
+        return false;
+    } else if (!EmailPattern.test(jEmail.value)) {
+        jEmail.classList.remove("is-valid");
+        jEmail.classList.add("is-invalid");
+        myJErr.textContent = "Invalid email format";
+        return false;
+    } else if (jEmail.value.length > 40) {
+        jEmail.classList.remove("is-valid");
+        jEmail.classList.add("is-invalid");
+        myJErr.textContent = "Your email must contain maximum 30 character";
+        return false;
+    } else {
+        jEmail.classList.remove("is-invalid");
+        jEmail.classList.add("is-valid");
+        return true;
+    }
+}
+
+function activeteButton() {
+    if (controlName() && controlEmail()) {
+        joinBtn.disabled = false;
+    } else {
+        joinBtn.disabled = true;
+    }
+}
+
+document.addEventListener("keyup", (event) => {
+    if (event.target.classList.contains("joinUs")) {
+        activeteButton();
+    }
+})
 
 // check inputs
 
