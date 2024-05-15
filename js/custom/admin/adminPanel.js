@@ -4,10 +4,7 @@ import {
     ref,
     onValue,
     push,
-    set,
-    get,
-    update,
-    remove
+    set
 } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-database.js";
 
 const firebaseConfig = {
@@ -23,11 +20,11 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
+
 const bookFormRef = ref(database, "book");
 const contactFormRef = ref(database, "contact");
 const joinUsRef = ref(database, "joinUs");
 const aboutStoreRef = ref(database, "aboutStore");
-
 
 
 const search = document.querySelector("#search");
@@ -39,12 +36,20 @@ const description = document.querySelector("#description");
 const bookType = document.querySelector("#bookType");
 const title = document.querySelector("#title");
 const descriptionForStore = document.querySelector("#descriptionForStore");
-const imageUrl2 = document.querySelector("#imageUrl2");
+const aboutImageUrl = document.querySelector("#imageUrl2");
 const btnAdd = document.querySelector("#addButton");
 const btnAddInfo = document.querySelector("#addInfoButton");
 const booksBody = document.querySelector("#booksBody");
 const contactUsBody = document.querySelector("#contactUsBody");
 const joinUsBody = document.querySelector("#joinUsBody");
+
+window.addEventListener("load", () => {
+    if (!(localStorage.login == "admin")) {
+        window.location.href = './adminLogin.html';
+    } else {
+        localStorage.removeItem("login");
+    }
+});
 
 
 let serachTimer = null;
@@ -89,22 +94,25 @@ function chooseBook() {
     })
 }
 
-
+let booksCount;
 function getBookDatasFromDB() {
+
     onValue(bookFormRef, (snap) => {
         const data = snap.val();
-        const booksArr = Object.values(data);
-        console.log(booksArr);
-        booksArr.forEach((item, index) => {
+        const booksIdsFromDB = Object.keys(data);
+        booksIdsFromDB.map((id, index) => {
+            const bookInformation = data[id];
             booksBody.innerHTML += `<tr>
             <td>${(index + 1)}</td>
-            <td>${item.bookName}</td>
-            <td>${item.description}</td>
-            <td>${item.bookType}</td>
-            <td>${item.authorName}</td>
+            <td>${bookInformation.bookName}</td>
+            <td id="desc">${bookInformation.description.length > 100 ? bookInformation.description.slice(0, 99) + "..." : bookInformation.description}</td>
+            <td>${bookInformation.bookType}</td>
+            <td>${bookInformation.authorName}</td>
+            <td> <button type="button" id="${id}" class="btn btn-outline-danger d-flex justify-content-around delete" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="bi bi-trash3"></i>Delete</button></td>
         </tr> `;
-        });
+        })
 
+        booksCount = booksIdsFromDB.length;
     });
 }
 
@@ -112,7 +120,6 @@ function getContactDatasFromDB() {
     onValue(contactFormRef, (snap) => {
         const data = snap.val();
         const contactsArr = Object.values(data);
-        console.log(contactsArr);
         contactsArr.forEach((item, index) => {
             contactUsBody.innerHTML += `<tr>
             <td>${(index + 1)}</td>
@@ -130,7 +137,6 @@ function getJoinUsDatasFromDB() {
     onValue(joinUsRef, (snap) => {
         const data = snap.val();
         const joinUsArr = Object.values(data);
-        console.log(joinUsArr);
         joinUsArr.forEach((item, index) => {
             joinUsBody.innerHTML += `<tr>
             <td>${(index + 1)}</td>
@@ -141,16 +147,17 @@ function getJoinUsDatasFromDB() {
 
     });
 }
-// fill book form starts
+
 async function fillInfo(text) {
+
     let request = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${text}`);
     let response = await request.json();
     let arr = response.items;
-    console.log(arr)
+
     if (Array.isArray(arr)) {
         bookName.value = arr[0].volumeInfo.title;
         for (let i = 0; i < arr[0].volumeInfo.authors.length; i++) {
-            author.value = arr[0].volumeInfo.authors[i] + " ";
+            author.value = arr[0].volumeInfo?.authors[i] + " ";
         }
         imageUrl.value = arr[0].volumeInfo.imageLinks.thumbnail;
         description.value = arr[0].volumeInfo.description;
@@ -161,49 +168,81 @@ async function fillInfo(text) {
             }
         }
 
-        if (bookName.value.trim().length > 0 && author.value.trim().length > 0 && imageUrl.value.trim().length > 0) {
-            btnAdd.disabled = false;
-
-            btnAdd.addEventListener("click", () => {
-                const bookFormObj = {
-                    bookName: bookName.value,
-                    authorName: author.value,
-                    ImageUrl: imageUrl.value,
-                    description: description.value,
-                    bookType: bookType.value
-                };
-                push(bookFormRef, bookFormObj);
-                bookName.value = "";
-                author.value = "";
-                imageUrl.value = "";
-                description.value = "";
-                bookType.value = "";
-                search.value = "";
-                btnAdd.disabled = true;
-                booksBody.innerHTML = "";
-                getBookDatasFromDB();
-            })
-            // // about store
-            // title.value = arr[0].volumeInfo.title;
-            // descriptionForStore.value = arr[0].volumeInfo.description;
-            // imageUrl2.value = arr[0].volumeInfo.imageLinks.thumbnail;
-            // btnAddInfo.disabled = false;
-            // // about store
-            // btnAddInfo.addEventListener("click", () => {
-            //     const aboutStoreObj = {
-            //         title: title.value,
-            //         description: descriptionForStore.value,
-            //         ImageUrl: imageUrl2.value
-            //     };
-            //     push(aboutStoreRef, aboutStoreObj);
-            //     title.value = "";
-            //     descriptionForStore.value = "";
-            //     imageUrl2.value = "";
-            //     btnAddInfo.disabled = true;
-            // })
-        }
+        sendDataToDB();
     }
 }
+
+function sendDataToDB() {
+    if (bookName.value.trim().length > 0 && author.value.trim().length > 0 && imageUrl.value.trim().length > 0) {
+        btnAdd.disabled = false;
+
+        btnAdd.addEventListener("click", () => {
+
+            const bookFormObj = {
+                id: (booksCount + 1),
+                bookName: bookName.value,
+                authorName: author.value,
+                ImageUrl: imageUrl.value,
+                description: description.value,
+                bookType: bookType.value
+            };
+
+            if (bookName.value.trim().length == 0 || author.value.trim().length == 0 || imageUrl.value.trim().length == 0) {
+                return;
+            } else {
+                push(bookFormRef, bookFormObj);
+
+            }
+
+            bookName.value = "";
+            author.value = "";
+            imageUrl.value = "";
+            description.value = "";
+            bookType.value = "";
+            search.value = "";
+            btnAdd.disabled = true;
+            booksBody.innerHTML = "";
+
+            getBookDatasFromDB();
+
+        })
+    }
+}
+
+document.addEventListener("click", (event) => {
+    deleteData(event);
+})
+
+function deleteData(event) {
+    if (event.target.classList.contains("delete")) {
+        document.querySelector("#confirmDelete").addEventListener("click", () => {
+            const deleteBookRef = ref(database, `book/${event.target.id}`);
+            set(deleteBookRef, null);
+            booksBody.innerHTML = "";
+            getBookDatasFromDB();
+        })
+    }
+}
+
+document.addEventListener("keyup", () => {
+    if (title.value.length > 10 && descriptionForStore.value.length > 10 && aboutImageUrl.value.length > 10) {
+        btnAddInfo.disabled = false;
+    }
+})
+
+
+btnAddInfo.addEventListener("click", () => {
+    const aboutStoreObj = {
+        title: title.value,
+        description: descriptionForStore.value,
+        ImageUrl: aboutImageUrl.value
+    };
+    push(aboutStoreRef, aboutStoreObj);
+    title.value = "";
+    descriptionForStore.value = "";
+    aboutImageUrl.value = "";
+    btnAddInfo.disabled = true;
+})
 
 window.onload = () => {
     getBookDatasFromDB();
@@ -211,6 +250,5 @@ window.onload = () => {
     getJoinUsDatasFromDB()
 };
 
-// fill book form ends
 
 

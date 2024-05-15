@@ -2,12 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/fireba
 import {
     getDatabase,
     ref,
-    onValue,
-    push,
-    set,
-    get,
-    update,
-    remove
+    onValue
 } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-database.js";
 
 const firebaseConfig = {
@@ -42,6 +37,7 @@ var myError = document.querySelector("#Error");
     myPassword.addEventListener("keyup", controlPassword);
 
     function controlName() {
+        btn.disabled = true;
         var myErr = document.querySelector("#ErrUsername");
 
         if (myName.value.length == 0) {
@@ -73,6 +69,7 @@ var myError = document.querySelector("#Error");
     }
 
     function controlPassword() {
+        btn.disabled = true;
         var myErr = document.querySelector("#ErrPassword");
         if (myPassword.value.length == 0) {
             myPassword.classList.remove("is-valid");
@@ -101,18 +98,29 @@ var myError = document.querySelector("#Error");
         if (status && pass && myName.value.trim().length > 3 && myPassword.value.trim().length > 3) {
             btn.disabled = false;
         }
+
     }
 })();
 
 btn.addEventListener("click", () => {
+    checkAdmin();
+})
+
+document.addEventListener("keydown", (event) => {
+    if (event.key == "Enter") {
+        checkAdmin();
+    }
+})
+
+function checkAdmin() {
     onValue(messageRef, (snap) => {
         const data = snap.val();
 
         if ((myName.value == data.login) && (myPassword.value == data.password)) {
+            localStorage.login = myName.value;
             window.location.href = './adminPanel.html';
         } else {
             myError.textContent = "Only admins have access !";
         }
     });
-
-})
+}
